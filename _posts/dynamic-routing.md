@@ -1,5 +1,5 @@
 ---
-title: Teraz wszystko działa
+title: Teraz wszystko działa. Widać? SUPER!
 excerpt: Tak, to wszystko działa. ESSA! Lorem ipsum dolor sit amet, consectetur
   adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
   aliqua. Praesent elementum facilisis leo vel fringilla est ullamcorper eget.
