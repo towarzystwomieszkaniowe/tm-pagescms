@@ -25,13 +25,13 @@ export default async function BlogPage() {
     'slug',
     'author',
     'coverImage',
-    'coverImageUrl',
     'excerpt',
   ]);
   
   console.log('Retrieved posts:', allPosts.length);
   
   // Mapowanie danych z Pages CMS do formatu oczekiwanego przez komponenty
+  // Dodajemy sprawdzenie typu i filtrowanie null
   const posts: BlogPost[] = allPosts
     .filter((post): post is NonNullable<typeof post> => post !== null)
     .map(post => {
@@ -44,7 +44,7 @@ export default async function BlogPage() {
           excerpt: post.excerpt || null,
           date: post.date || new Date().toISOString(),
           author: post.author?.name || 'Admin',
-          imageUrl: post.effectiveCoverImage || null
+          imageUrl: post.coverImage || null
         }
       };
     });

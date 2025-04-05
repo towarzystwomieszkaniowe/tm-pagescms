@@ -13,8 +13,6 @@ export type Post = {
   content?: string;
   excerpt?: string;
   coverImage?: string;
-  coverImageUrl?: string;
-  effectiveCoverImage?: string;
   author?: {
     name?: string;
     picture?: string;
@@ -83,29 +81,6 @@ export function getPostBySlug(slug: string, fields: string[] = []): Post | null 
     if (!items.slug) {
       items.slug = realSlug;
     }
-    
-    // Handle the cover image logic - prefer URL if provided, otherwise use uploaded image
-    if ((fields.includes('coverImage') || fields.includes('coverImageUrl') || fields.includes('effectiveCoverImage'))) {
-      const coverImageUrl = data.coverImageUrl;
-      const coverImage = data.coverImage;
-      
-      // Set the effective cover image based on what's available
-      if (coverImageUrl && coverImageUrl.trim() !== '') {
-        items.effectiveCoverImage = coverImageUrl;
-      } else if (coverImage && coverImage.trim() !== '') {
-        items.effectiveCoverImage = coverImage;
-      } else {
-        items.effectiveCoverImage = '/assets/blog/default/cover.jpg'; // Default image
-      }
-      
-      // Include the original fields if requested
-      if (fields.includes('coverImage')) {
-        items.coverImage = data.coverImage;
-      }
-      if (fields.includes('coverImageUrl')) {
-        items.coverImageUrl = data.coverImageUrl;
-      }
-    }
 
     return items as Post;
   } catch (error) {
@@ -124,18 +99,12 @@ export function getAllPosts(fields: string[] = []): Post[] {
   }
   
   // Dodaj podstawowe pola, jeśli nie zostały określone
-  const essentialFields = ['title', 'date', 'excerpt', 'coverImage', 'coverImageUrl'];
+  const essentialFields = ['title', 'date', 'excerpt', 'coverImage', 'author'];
   essentialFields.forEach(field => {
     if (!fields.includes(field)) {
       fields.push(field);
     }
   });
-  
-  // Add effectiveCoverImage to fields if we're requesting either coverImage or coverImageUrl
-  if ((fields.includes('coverImage') || fields.includes('coverImageUrl')) && 
-      !fields.includes('effectiveCoverImage')) {
-    fields.push('effectiveCoverImage');
-  }
   
   const posts = slugs
     .map((slug) => getPostBySlug(slug, fields))
