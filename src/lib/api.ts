@@ -1,28 +1,70 @@
-import { Post } from "@/interfaces/post";
-import fs from "fs";
-import matter from "gray-matter";
-import { join } from "path";
+import fs from 'fs';
+import { join } from 'path';
+import matter from 'gray-matter';
 
-const postsDirectory = join(process.cwd(), "_posts");
+// Zmiana ścieżki na _posts, gdzie aktualnie znajdują się Twoje posty
+const postsDirectory = join(process.cwd(), '_posts');
 
 export function getPostSlugs() {
-  return fs.readdirSync(postsDirectory);
+  try {
+    return fs.readdirSync(postsDirectory);
+  } catch (error) {
+    console.error('Error reading blog directory:', error);
+    return [];
+  }
 }
 
-export function getPostBySlug(slug: string) {
-  const realSlug = slug.replace(/\.md$/, "");
+export function getPostBySlug(slug: string, fields: string[] = []) {
+  const realSlug = slug.replace(/\.md$/, '');
   const fullPath = join(postsDirectory, `${realSlug}.md`);
-  const fileContents = fs.readFileSync(fullPath, "utf8");
+  
+  if (!fs.existsSync(fullPath)) {
+    console.error(`Post file not found: ${fullPath}`);
+    return null;
+  }
+  
+  const fileContents = fs.readFileSync(fullPath, 'utf8');
   const { data, content } = matter(fileContents);
 
-  return { ...data, slug: realSlug, content } as Post;
+  type Items = {
+    [key: string]: string | any;
+  };
+
+  const items: Items = {};
+
+  // Ensure only the minimal needed data is exposed
+  fields.forEach((field) => {
+    if (field === 'slug') {
+      items[field] = realSlug;
+    }
+    if (field === 'content') {
+      items[field] = content;
+    }
+
+    if (typeof data[field] !== 'undefined') {
+      items[field] = data[field];
+    }
+  });
+
+  return items;
 }
 
-export function getAllPosts(): Post[] {
+export function getAllPosts(fields: string[] = []) {
   const slugs = getPostSlugs();
+  console.log('Found post slugs:', slugs); // Dodajemy log dla debugowania
+  
   const posts = slugs
-    .map((slug) => getPostBySlug(slug))
+    .map((slug) => {
+      const post = getPostBySlug(slug, fields);
+      if (!post) {
+        console.error(`Failed to get post for slug: ${slug}`);
+      }
+      return post;
+    })
+    .filter((post) => post !== null) // Filter out null posts
     // sort posts by date in descending order
     .sort((post1, post2) => (post1.date > post2.date ? -1 : 1));
+  
+  console.log(`Processed ${posts.length} posts`); // Dodajemy log dla debugowania
   return posts;
 }
