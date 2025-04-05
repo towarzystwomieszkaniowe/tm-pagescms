@@ -6,9 +6,9 @@ content:
   - name: blog
     label: Blog
     type: collection
-    path: _blog
+    path: _posts
     view:
-      fields: [ coverImage, title, date ]
+      fields: [ title, date, author ]
     fields:
       - { name: title, label: Title, type: string, required: true }
       - { name: excerpt, label: Excerpt, type: string }

@@ -2,10 +2,10 @@ import fs from 'fs';
 import { join } from 'path';
 import matter from 'gray-matter';
 
-// Path to the posts directory
+// Ścieżka do katalogu z postami - zgodna z dokumentacją PagesCMS
 const postsDirectory = join(process.cwd(), '_posts');
 
-// Define Post type to match the structure in Pages CMS
+// Definicja typu Post zgodna ze strukturą w plikach markdown
 export type Post = {
   slug: string;
   title: string;
@@ -20,12 +20,21 @@ export type Post = {
   ogImage?: {
     url?: string;
   };
+  body?: string; // Dodane pole body dla zawartości HTML
   [key: string]: any;
 };
 
 export function getPostSlugs() {
   try {
-    return fs.readdirSync(postsDirectory);
+    // Sprawdzamy, czy katalog istnieje przed próbą odczytu
+    if (!fs.existsSync(postsDirectory)) {
+      console.error(`Posts directory not found: ${postsDirectory}`);
+      return [];
+    }
+    
+    const slugs = fs.readdirSync(postsDirectory);
+    console.log(`Found ${slugs.length} post files in ${postsDirectory}`);
+    return slugs;
   } catch (error) {
     console.error('Error reading blog directory:', error);
     return [];
@@ -45,6 +54,9 @@ export function getPostBySlug(slug: string, fields: string[] = []): Post | null 
     const fileContents = fs.readFileSync(fullPath, 'utf8');
     const { data, content } = matter(fileContents);
 
+    // Konwersja zawartości Markdown na HTML (jeśli potrzebne)
+    // W oryginalnym kodzie to było prawdopodobnie robione w innym miejscu
+
     const items: Partial<Post> = {};
 
     // Ensure only the minimal needed data is exposed
@@ -53,6 +65,10 @@ export function getPostBySlug(slug: string, fields: string[] = []): Post | null 
         items[field] = realSlug;
       }
       if (field === 'content') {
+        items[field] = content;
+      }
+      if (field === 'body') {
+        // Jeśli potrzebujesz przetworzonego HTML, możesz dodać tutaj konwersję
         items[field] = content;
       }
 
@@ -81,6 +97,14 @@ export function getAllPosts(fields: string[] = []): Post[] {
   if (!fields.includes('slug')) {
     fields.push('slug');
   }
+  
+  // Dodaj podstawowe pola, jeśli nie zostały określone
+  const essentialFields = ['title', 'date', 'excerpt', 'coverImage', 'author'];
+  essentialFields.forEach(field => {
+    if (!fields.includes(field)) {
+      fields.push(field);
+    }
+  });
   
   const posts = slugs
     .map((slug) => getPostBySlug(slug, fields))
