@@ -47,11 +47,86 @@ const Form = ({ onSubmit }: FormProps) => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Formularz wysłany:', formData);
-    if (onSubmit) {
-      onSubmit(formData);
+    
+    try {
+      // Google Forms URL
+      const googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSer14gIDiNhx7litsg2204PDKhFLiJ_wGhVAgL21TUi4WRYnA/formResponse';
+      
+      // Mapowanie pól formularza na identyfikatory Google Forms
+      const formDataToSend = new URLSearchParams();
+      formDataToSend.append('entry.1221390721', formData.imie);
+      formDataToSend.append('entry.735359051', formData.nazwisko);
+      formDataToSend.append('entry.967198342', formData.email);
+      formDataToSend.append('entry.288672856', formData.rodzajNieruchomosci);
+      formDataToSend.append('entry.1027675616', formData.telefon);
+      formDataToSend.append('entry.341759620', formData.lokalizacja);
+      formDataToSend.append('entry.1236530735', formData.metraz);
+      formDataToSend.append('entry.1154188618', formData.dodatkoweInfo);
+      
+      // Wysłanie danych do Google Forms za pomocą fetch
+      // Uwaga: Ze względu na CORS, bezpośrednie wysłanie może nie działać w przeglądarce
+      // Alternatywnie można użyć iframe lub przekierowania
+      
+      // Metoda 1: Przekierowanie (działa, ale opuszcza stronę)
+      // window.location.href = `${googleFormUrl}?${formDataToSend.toString()}`;
+      
+      // Metoda 2: Użycie ukrytego iframe (obejście CORS)
+      const iframe = document.createElement('iframe');
+      iframe.name = 'hidden_iframe';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+      
+      // Tworzenie i wysyłanie formularza
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = googleFormUrl;
+      form.target = 'hidden_iframe';
+      
+      // Dodawanie pól do formularza
+      formDataToSend.forEach((value, key) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
+      });
+      
+      document.body.appendChild(form);
+      form.submit();
+      
+      // Czyszczenie formularza po wysłaniu
+      setTimeout(() => {
+        document.body.removeChild(form);
+        // Opcjonalnie: usunięcie iframe po pewnym czasie
+        // document.body.removeChild(iframe);
+      }, 500);
+      
+      // Resetowanie formularza
+      setFormData({
+        imie: '',
+        nazwisko: '',
+        email: '',
+        rodzajNieruchomosci: 'Mieszkanie',
+        telefon: '',
+        lokalizacja: '',
+        metraz: '',
+        dodatkoweInfo: '',
+        zgodaMarketing: false
+      });
+      
+      // Powiadomienie użytkownika
+      alert('Dziękujemy za wysłanie formularza!');
+      
+      // Wywołanie onSubmit jeśli istnieje
+      if (onSubmit) {
+        onSubmit(formData);
+      }
+    } catch (error) {
+      console.error('Błąd podczas wysyłania formularza:', error);
+      alert('Wystąpił błąd podczas wysyłania formularza. Spróbuj ponownie później.');
     }
   };
 
