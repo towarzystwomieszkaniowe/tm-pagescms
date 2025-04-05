@@ -19,7 +19,8 @@ content:
       - name: coverImageUrl
         label: "OR Cover Image URL"
         type: string
-        description: "Alternatively, enter a URL to an external image"
+        description: "Alternatively, enter a URL to an external image (e.g., https://example.com/image.jpg)"
+        pattern: "^(https?:\\/\\/).*\\.(jpg|jpeg|png|gif|webp|svg)$"
       - { name: date, label: Date, type: date, options: { time: true, format: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" } }
       - name: author
         label: Author
@@ -31,5 +32,9 @@ content:
         label: Image (social sharing)
         type: object
         fields:
-          - { name: url, label: URL, type: image }
+          - name: url
+            label: URL
+            type: string
+            description: "Enter a URL to an image for social sharing (e.g., https://example.com/image.jpg)"
+            pattern: "^(https?:\\/\\/).*\\.(jpg|jpeg|png|gif|webp|svg)$"
       - { name: body, label: Body, type: rich-text }
