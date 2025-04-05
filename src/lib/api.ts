@@ -2,8 +2,26 @@ import fs from 'fs';
 import { join } from 'path';
 import matter from 'gray-matter';
 
-// Zmiana ścieżki na _posts, gdzie aktualnie znajdują się Twoje posty
+// Path to the posts directory
 const postsDirectory = join(process.cwd(), '_posts');
+
+// Define Post type to match the structure in Pages CMS
+export type Post = {
+  slug: string;
+  title: string;
+  date: string;
+  content?: string;
+  excerpt?: string;
+  coverImage?: string;
+  author?: {
+    name?: string;
+    picture?: string;
+  };
+  ogImage?: {
+    url?: string;
+  };
+  [key: string]: any;
+};
 
 export function getPostSlugs() {
   try {
@@ -14,7 +32,7 @@ export function getPostSlugs() {
   }
 }
 
-export function getPostBySlug(slug: string, fields: string[] = []) {
+export function getPostBySlug(slug: string, fields: string[] = []): Post | null {
   const realSlug = slug.replace(/\.md$/, '');
   const fullPath = join(postsDirectory, `${realSlug}.md`);
   
@@ -23,48 +41,53 @@ export function getPostBySlug(slug: string, fields: string[] = []) {
     return null;
   }
   
-  const fileContents = fs.readFileSync(fullPath, 'utf8');
-  const { data, content } = matter(fileContents);
+  try {
+    const fileContents = fs.readFileSync(fullPath, 'utf8');
+    const { data, content } = matter(fileContents);
 
-  type Items = {
-    [key: string]: string | any;
-  };
+    const items: Partial<Post> = {};
 
-  const items: Items = {};
+    // Ensure only the minimal needed data is exposed
+    fields.forEach((field) => {
+      if (field === 'slug') {
+        items[field] = realSlug;
+      }
+      if (field === 'content') {
+        items[field] = content;
+      }
 
-  // Ensure only the minimal needed data is exposed
-  fields.forEach((field) => {
-    if (field === 'slug') {
-      items[field] = realSlug;
+      if (typeof data[field] !== 'undefined') {
+        items[field] = data[field];
+      }
+    });
+
+    // Always include slug if not already included
+    if (!items.slug) {
+      items.slug = realSlug;
     }
-    if (field === 'content') {
-      items[field] = content;
-    }
 
-    if (typeof data[field] !== 'undefined') {
-      items[field] = data[field];
-    }
-  });
-
-  return items;
+    return items as Post;
+  } catch (error) {
+    console.error(`Error processing post ${slug}:`, error);
+    return null;
+  }
 }
 
-export function getAllPosts(fields: string[] = []) {
+export function getAllPosts(fields: string[] = []): Post[] {
   const slugs = getPostSlugs();
-  console.log('Found post slugs:', slugs); // Dodajemy log dla debugowania
+  console.log('Found post slugs:', slugs);
+  
+  // Always include slug in the fields
+  if (!fields.includes('slug')) {
+    fields.push('slug');
+  }
   
   const posts = slugs
-    .map((slug) => {
-      const post = getPostBySlug(slug, fields);
-      if (!post) {
-        console.error(`Failed to get post for slug: ${slug}`);
-      }
-      return post;
-    })
-    .filter((post) => post !== null) // Filter out null posts
+    .map((slug) => getPostBySlug(slug, fields))
+    .filter((post): post is Post => post !== null) // Type guard to filter out null posts
     // sort posts by date in descending order
     .sort((post1, post2) => (post1.date > post2.date ? -1 : 1));
   
-  console.log(`Processed ${posts.length} posts`); // Dodajemy log dla debugowania
+  console.log(`Processed ${posts.length} posts`);
   return posts;
 }
