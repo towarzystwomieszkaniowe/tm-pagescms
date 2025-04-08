@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { GoogleTagManager } from '@next/third-parties/google';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import "./globals.css";
 import Navbar from './Shared/Navbar';
 import Footer from './Shared/Footer';
@@ -29,6 +30,7 @@ export default function RootLayout({
     <html lang="pl">
       <head>
         <GoogleTagManager gtmId="GTM-KDPWS2HX" />
+        <GoogleAnalytics gaId="G-ZVYFV6XNTE" />
       </head>
       <body
         suppressHydrationWarning
