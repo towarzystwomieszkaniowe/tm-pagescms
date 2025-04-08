@@ -4,15 +4,13 @@ import BackToLink from '../components/BackToLink';
 import { getPostBySlug } from '../../../lib/api';
 import markdownToHtml from '../../../lib/markdownToHtml';
 
-// Poprawna definicja typu zgodna z wymaganiami Next.js dla dynamicznych stron
-type Props = {
+interface PageProps {
   params: {
     slug: string;
   };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
+}
 
-export default async function BlogPostPage({ params }: Props) {
+export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = params;
 
   // Pobieranie posta po stronie serwera
@@ -31,9 +29,10 @@ export default async function BlogPostPage({ params }: Props) {
     return notFound();
   }
 
-  // Reszta kodu pozostaje bez zmian
+  // Konwersja markdown na HTML
   const htmlContent = await markdownToHtml(postData.content || '');
 
+  // Mapowanie danych do formatu oczekiwanego przez komponent
   const post = {
     id: postData.slug,
     title: postData.title,
