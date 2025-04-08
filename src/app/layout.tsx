@@ -28,12 +28,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl">
+      {/* GTM musi być tutaj – bezpośrednio jako pierwsze dziecko html */}
       <GoogleTagManager gtmId="GTM-KDPWS2HX" />
       <head />
       <body
         suppressHydrationWarning
         className={`${inter.variable} antialiased`}
       >
+        {/* Google Analytics można zostawić w body */}
         <GoogleAnalytics gaId="G-ZVYFV6XNTE" />
         <Navbar />
         {children}
