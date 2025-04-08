@@ -28,13 +28,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl">
-      <head>
-      </head>
+      <GoogleTagManager gtmId="GTM-KDPWS2HX" />
+      <head />
       <body
         suppressHydrationWarning
         className={`${inter.variable} antialiased`}
       >
-        <GoogleTagManager gtmId="GTM-KDPWS2HX" />
         <GoogleAnalytics gaId="G-ZVYFV6XNTE" />
         <Navbar />
         {children}
