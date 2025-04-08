@@ -4,15 +4,16 @@ import BackToLink from '../components/BackToLink';
 import { getPostBySlug } from '../../../lib/api';
 import markdownToHtml from '../../../lib/markdownToHtml';
 
-interface PageProps {
+// Poprawna definicja typu PageProps zgodna z wymaganiami Next.js
+type PageProps = {
   params: {
     slug: string;
   };
-}
+};
 
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = params;
-  
+
   // Pobieranie posta po stronie serwera
   const postData = getPostBySlug(slug, [
     'title',
@@ -24,14 +25,14 @@ export default async function BlogPostPage({ params }: PageProps) {
     'excerpt',
     'ogImage'
   ]);
-  
+
   if (!postData) {
     return notFound();
   }
 
   // Konwersja markdown na HTML
   const htmlContent = await markdownToHtml(postData.content || '');
-  
+
   // Mapowanie danych do formatu oczekiwanego przez komponent
   const post = {
     id: postData.slug,
@@ -74,7 +75,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
           {/* Post header */}
           <header className="mb-8">
-            <h1 
+            <h1
               className="text-3xl md:text-4xl lg:text-5xl font-bold text-[var(--text-black)] mb-4"
               itemProp="headline"
             >
@@ -95,8 +96,8 @@ export default async function BlogPostPage({ params }: PageProps) {
           </header>
 
           {/* Post content */}
-          <div 
-            className="prose prose-lg max-w-none text-[var(--text-gray)]" 
+          <div
+            className="prose prose-lg max-w-none text-[var(--text-gray)]"
             itemProp="articleBody"
           >
             {post.body && (
