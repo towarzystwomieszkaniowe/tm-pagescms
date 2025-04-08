@@ -4,14 +4,8 @@ import BackToLink from '../components/BackToLink';
 import { getPostBySlug } from '../../../lib/api';
 import markdownToHtml from '../../../lib/markdownToHtml';
 
-type Props = {
-  params: {
-    slug: string;
-  };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
-
-export default async function BlogPostPage({ params }: Props) {
+// Removing the type definition completely to let Next.js infer the correct type
+export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   const { slug } = params;
 
   // Pobieranie posta po stronie serwera
