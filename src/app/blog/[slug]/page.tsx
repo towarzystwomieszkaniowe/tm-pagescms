@@ -4,13 +4,14 @@ import BackToLink from '../components/BackToLink';
 import { getPostBySlug } from '../../../lib/api';
 import markdownToHtml from '../../../lib/markdownToHtml';
 
-interface PageProps {
+type Props = {
   params: {
     slug: string;
   };
-}
+  searchParams: { [key: string]: string | string[] | undefined };
+};
 
-export default async function BlogPostPage({ params }: PageProps) {
+export default async function BlogPostPage({ params }: Props) {
   const { slug } = params;
 
   // Pobieranie posta po stronie serwera
