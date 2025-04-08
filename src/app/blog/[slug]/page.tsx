@@ -4,8 +4,8 @@ import BackToLink from '../components/BackToLink';
 import { getPostBySlug } from '../../../lib/api';
 import markdownToHtml from '../../../lib/markdownToHtml';
 
-// Removing the type definition completely to let Next.js infer the correct type
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+// Remove type annotation completely to let Next.js infer the correct type
+export default async function BlogPostPage({ params }) {
   const { slug } = params;
 
   // Pobieranie posta po stronie serwera
