@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { GoogleAnalytics } from '@next/third-parties/google';
+import { GoogleTagManager } from '@next/third-parties/google';
 import "./globals.css";
 import Navbar from './Shared/Navbar';
 import Footer from './Shared/Footer';
@@ -27,16 +27,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl">
+      <head>
+        <GoogleTagManager gtmId="GTM-KDPWS2HX" />
+      </head>
       <body
         suppressHydrationWarning
         className={`${inter.variable} antialiased`}
       >
+        <GoogleTagManager gtmId="GTM-KDPWS2HX" />
         <Navbar />
         {children}
         <ContactForm />
         <Footer />
         <CookieBanner />
-        <GoogleAnalytics gaId="G-ZVYFV6XNTE" />
       </body>
     </html>
   );
